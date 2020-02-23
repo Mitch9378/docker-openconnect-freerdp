@@ -10,32 +10,30 @@ run apk update
 # update and install packages
 run apk update
 run apk upgrade
-run apk add openconnect@testing freerdp@community bash bash-completion tmux sudo openssh iputils 
+run apk add openconnect@testing freerdp@community bash bash-completion zsh tmux nano sudo openssh iputils wget git
+
+# load tun
+run echo "tun" >> /etc/modules-load.d/tun.conf
 
 # create our developer user
-workdir /root
-run addgroup --gid 1000 developer
-run adduser developer -G developer --uid 1000 --shell /bin/bash --system --home /developer --shell /bin/bash
-run echo "developer ALL=(ALL) ALL"
-copy /developer /developer
-run mv /etc/vpnc/vpnc-script /etc/vpnc/vpnc-script.bak
-run mv /developer/vpnc-script /etc/vpnc
+run addgroup developer
+run adduser --disabled-password developer -G developer --shell /bin/zsh
 
-# custom scripts
-copy /custom-bin /developer/bin
-
-# set permissions
-run chmod +x /developer/bin/*
-run chown -R developer:developer /developer
+# allow root
 run echo "%developer ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
-# cleanup aur packages
-user root
-workdir /developer
 
 # switch users
 user developer
+workdir /home/developer
+
+# custom scripts
+run mkdir ./bin
+copy /custom-bin ./bin
+run chmod +x ./bin/*
+
+#oh my zsh 
+RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 
 # start a terminal
-entrypoint ["tmux", "-u"]
+entrypoint ["tmux"]
 

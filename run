@@ -8,11 +8,9 @@ docker run \
        -it \
        --rm \
       -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-      -v ${HOME}:/developer/shared \
       -e DISPLAY=unix${DISPLAY} \
-      -p 8989:8989 \
       --device /dev/snd \
-      --privileged \
-      --name anyconnect-remmina \
-      cmiles74/docker-openconnect-freerdp
-
+      --device /dev/net/tun \
+      --cap-add=NET_ADMIN \
+      --name freerdp-openconnect \
+      <IMAGE_ID HERE>
